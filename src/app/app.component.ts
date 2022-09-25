@@ -1,5 +1,6 @@
 import {Component, HostListener} from '@angular/core';
 import {FormBuilder, Validators} from "@angular/forms";
+import {AppService} from "./app.service";
 
 @Component({
   selector: 'app-root',
@@ -78,7 +79,7 @@ export class AppComponent {
     }
   ]
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private appService: AppService) {
   }
 
 
@@ -93,22 +94,39 @@ export class AppComponent {
   }
 
   trans: any;
+
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(e: MouseEvent) {
     this.trans = {transform: 'translate3d(' + ((e.clientX * 0.3) / 8) + 'px,' + ((e.clientY * 0.3) / 8) + 'px,0px)'};
   }
 
   bgPos: any;
+
   @HostListener('document:scroll', ['$event'])
   onScroll() {
     this.bgPos = {backgroundPositionX: '0' + (0.3 * window.scrollY) + 'px'};
   }
 
+
+
+
+
   /*Обработчик отправки формы с заполненными значениями*/
   onSubmit() {
-    if (this.priceForm.valid) {
-      alert("Спасибо за заказ, мы свяжемся с вами!")
-      this.priceForm.reset();
-    }
+
+    this.appService.sendQuery(this.priceForm.value)
+      .subscribe(
+        /*эта функция сработает в случае успешной валидации*/
+        {
+          next: (response: any) => {
+             alert(response.message); /*сообщение будет выдавать сервер*/
+             this.priceForm.reset(); /*после успешного ответа, данные формы будут очищены*/
+          },
+          /*эта функция сработает в случае если форма заполнена плохо*/
+          error: (response) => {
+            alert(response.error.message)
+          }
+        }
+      );
   }
 }
