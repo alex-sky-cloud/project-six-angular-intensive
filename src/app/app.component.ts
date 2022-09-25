@@ -28,10 +28,15 @@ export class AppComponent {
 
 /*инициализация данных продуктов, в момент открытия страницы. Также будут загружены и фото продуктов*/
 ngOnInit(){
-  this.appService
-    .getData()
-    .subscribe(carsData => this.carsData = carsData);
+  this.appService.getData(this.category).subscribe(carsData => this.carsData = carsData);
 }
+
+  category: string = 'sport';
+
+  toggleCategory(category: string) {
+    this.category = category;
+    this.ngOnInit();
+  }
 
   /*Плавное перемещение к секции ввода данных,
    при нажатии на кнопку Забронировать, и  заполнение карточки названием
